@@ -11,13 +11,21 @@
         $(document).ready(function () {
             $('.btn').click(function () {
                 var id = this.name
+                // make this toggle switch
+                var bool_id = '#'+id
+                var boo = $(bool_id).text()
+                if(boo === 'true')
+                    boo = 'false'
+                else
+                    boo = 'true'
+                console.log(boo.toString())
                 $.ajax({
-                    url: '/tasks/'+id,
+                    url: '/tasks/' + id,
                     type: 'PATCH',
-                    dataType:'json',
-                    data: JSON.stringify({"completed":"true"}),
+                    dataType: 'json',
+                    data: { "completed": boo.toString() },
                     success: function (data, status) {
-                        console.log(data)
+                        //console.log(data)
                     }
                 })
             })
@@ -32,11 +40,19 @@
         <li>
             <form method="patch" action="/tasks/" +this._id>
                 <p>{{this.description}}</p>
-                <p>{{this.completed}} m </p>
-                <button type='button' name={{this._id}} class="btn task">click me to complete</button>
+                <p id={{this._id}}>{{this.completed}}</p>
+                <button name={{this._id}} class="btn task">click me to complete</button>
             </form>
         </li>
         {{/each}}
+
+        <form action="">
+            <label for="">Description</label>
+            <input type="text" value="">
+            <br>
+            <label for="">Completed</label>
+            <input type="checkbox">
+        </form>
         {{!-- {{task}} --}}
     </ul>
 </body>

@@ -56,7 +56,7 @@ router.patch('/tasks/:id', async (req, res)=>{
     const allowedUpdates = ["description", "completed"]
     const isValidUpdate = updates.every((update)=>allowedUpdates.includes(update))
 
-    console.log(req)
+    // console.log(req.body)
 
     if(!isValidUpdate){
         return res.status(400).send("invalid update")
