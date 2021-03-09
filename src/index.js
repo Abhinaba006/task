@@ -4,10 +4,10 @@ const path = require('path')
 require('./db/mongoose')
 const User = require('./models/users')
 const Tasks = require('./models/tasks')
-
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
 const auth = require('./middlewares/auth')
+const bodyParser = require("body-parser");
 
 /////////////////////////////////////
 //for frontend
@@ -46,6 +46,8 @@ const port = process.env.PORT || 3000
 // })  
 
 app.use(express.json()) //automatically parse json file recived 
+app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(userRouter)
 app.use(taskRouter)
 
