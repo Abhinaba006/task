@@ -2,6 +2,7 @@ const express = require('express')
 const bcrypt = require('bcryptjs')
 const path = require('path')
 const bodyParser = require("body-parser");
+const dotenv = require('dotenv')
 
 require('./db/mongoose')
 const User = require('./models/users')
@@ -9,6 +10,12 @@ const Tasks = require('./models/tasks')
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
 const auth = require('./middlewares/auth')
+
+//check if enviorment is roduction
+
+if(process.env.NODE_ENV !== 'production'){
+    dotenv.config({path:"../.env"})
+}
 
 
 /////////////////////////////////////

@@ -4,6 +4,9 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const Tas = require('../models/tasks')
 const Tasks = require('../models/tasks')
+const dotenv = require('dotenv')
+
+require('dotenv').config({path:'.env'})
 
 const userSchema = mongoose.Schema({
     name: {
@@ -52,9 +55,9 @@ const userSchema = mongoose.Schema({
 
 //virtual data is not stored in the databasse but it is used to define relationship
 userSchema.virtual('tasks', {
-    ref : 'Tasks',
-    localField:'_id',
-    foreignField:'owner'
+    ref: 'Tasks',
+    localField: '_id',
+    foreignField: 'owner'
 })
 
 // userSchema.methods.toJSON = function() {
@@ -65,9 +68,9 @@ userSchema.virtual('tasks', {
 //     return userObj
 // }
 
-userSchema.methods.generateAuthToken = async function() {
+userSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({ _id: user.id.toString() }, 'MyNameIsAbhinaba')
+    const token = jwt.sign({ _id: user.id.toString() }, process.env.SECRET_KEY)
 
     user.tokens = user.tokens.concat({ token })
     await user.save()
@@ -75,22 +78,22 @@ userSchema.methods.generateAuthToken = async function() {
     return token
 }
 
-userSchema.statics.findbyCredentials = async(email, password) => {
-        const user = await User.findOne({ email })
+userSchema.statics.findbyCredentials = async (email, password) => {
+    const user = await User.findOne({ email })
 
-        if (!user) {
-            throw new Error('Unable to login')
-        }
-        const isMatch = await bcrypt.compare(password, user.password)
-
-        if (!isMatch) {
-            throw new Error('Unable to login')
-        }
-
-        return user
+    if (!user) {
+        throw new Error('Unable to login')
     }
-    //Hash the plain text password
-userSchema.pre('save', async function(next) { // save is the  name of the event
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+        throw new Error('Unable to login')
+    }
+
+    return user
+}
+//Hash the plain text password
+userSchema.pre('save', async function (next) { // save is the  name of the event
 
     const user = this
 
@@ -102,9 +105,9 @@ userSchema.pre('save', async function(next) { // save is the  name of the event
 })
 
 // delete user task when removed
-userSchema.pre('remove', async function(next){
+userSchema.pre('remove', async function (next) {
     const user = this
-    await Tasks.deleteMany({ owner:user._id })
+    await Tasks.deleteMany({ owner: user._id })
     next()
 })
 
