@@ -1,6 +1,6 @@
 const express = require('express')
 const bcrypt = require('bcryptjs')
-const path = require('path')
+// const path = require('path')
 require('./db/mongoose')
 const User = require('./models/users')
 const Tasks = require('./models/tasks')
@@ -11,21 +11,21 @@ const bodyParser = require("body-parser");
 
 /////////////////////////////////////
 //for frontend
-const hbs = require('hbs')
-//define paths for express
-const public = path.join(__dirname, '../public');
-const view_path = path.join(__dirname, '../templates/views')
-const partials_path = path.join(__dirname, '../templates/partials')
+// const hbs = require('hbs')
+// //define paths for express
+// const public = path.join(__dirname, '../public');
+// const view_path = path.join(__dirname, '../templates/views')
+// const partials_path = path.join(__dirname, '../templates/partials')
 
 // init the app
 const app = express()
 
-//set hbs
-app.set('view engine', 'hbs')
-app.set('views', view_path)
-hbs.registerPartials(partials_path)
+// //set hbs
+// app.set('view engine', 'hbs')
+// app.set('views', view_path)
+// hbs.registerPartials(partials_path)
 
-app.use(express.static(public)) ;   //setup directory to serve css
+// app.use(express.static(public)) ;   //setup directory to serve css
 
 ////////////////////////////////
 
