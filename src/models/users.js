@@ -92,17 +92,6 @@ userSchema.statics.findbyCredentials = async (email, password) => {
 
     return user
 }
-//Hash the plain text password
-userSchema.pre('save', async function (next) { // save is the  name of the event
-
-    const user = this
-
-    if (user.isModified('password')) {
-        user.password = await bcrypt.hash(user.password, 8)
-    }
-
-    next()
-})
 
 // delete user task when removed
 userSchema.pre('remove', async function (next) {
