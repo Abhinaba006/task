@@ -6,6 +6,10 @@ const auth = require('../middlewares/auth')
 const router = new express.Router()
 
 router.post('/tasks', auth, async (req, res)=>{
+    if(req.body.completed){
+        req.body.completed = true
+    }
+    console.log(req.body)
     //const tasks = new Tasks(req.body)
     const task = new Tasks({
         ...req.body,
@@ -14,7 +18,8 @@ router.post('/tasks', auth, async (req, res)=>{
 
     try{
         const tasks = await task.save()
-        res.send(tasks)
+        // res.send(tasks)
+        res.redirect('/tasks')
     }catch(err){
         res.status(500).send(err)
     }
