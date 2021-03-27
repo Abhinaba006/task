@@ -47,7 +47,10 @@ const userSchema = mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    avatar:{
+        type:Buffer
+    }
 })
 
 //virtual data is not stored in the databasse but it is used to define relationship
@@ -62,6 +65,7 @@ userSchema.methods.toJSON = function() {
     const userObj = user.toObject()
     delete userObj.password
     delete userObj.tokens
+    delete userObj.avatar
     return userObj
 }
 

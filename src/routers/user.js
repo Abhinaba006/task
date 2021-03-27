@@ -1,23 +1,23 @@
 const express = require('express')
 const { model } = require('mongoose')
 const multer = require('multer')
+const sharp = require('sharp')
 const User = require('../models/users')
 const auth = require('../middlewares/auth')
 
 const router = new express.Router()
 const upload = multer({
-    dest:'avatar',
-    limits:{
+    limits: {
         fileSize: 2000000
     },
-    fileFilter(req, file, cb){
+    fileFilter(req, file, cb) {
         // cb(new Error('file must be an image'))
         // cb(undefined, true)
-        if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
-            return cb(new Error('provide a jpg file'))
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) { // this function runs when new file is uploded   
+            return cb(new Error('provide a img file'))
         }
 
-        cb(undefined, true)
+        cb(undefined, true) //cb is callback and is called if ll is ok // true means it will accept it
     }
 })
 
@@ -25,7 +25,7 @@ const upload = multer({
 //     res.send('auth')
 // })
 
-router.post('/users', async (req, res)=>{
+router.post('/users', async (req, res) => {
     const user = new User(req.body)
 
     // user.save().then((result)=>{
@@ -33,52 +33,52 @@ router.post('/users', async (req, res)=>{
     // }).catch((err)=>{
     //     res.status(400).send(err)
     // })
-    try{
+    try {
         const result = await user.save()
         const token = await user.generateAuthToken()
-        res.status(201).send({result, token})
-    }catch(e){
+        res.status(201).send({ result, token })
+    } catch (e) {
         res.status(400).send(e)
     }
 })
 
-router.post('/users/login', async (req, res)=>{
-    try{
+router.post('/users/login', async (req, res) => {
+    try {
         const user = await User.findbyCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
-        res.send({user, token})
-    }catch(e){
+        res.send({ user, token })
+    } catch (e) {
         res.status(400).send()
     }
 })
 
-router.post('/users/logout', auth, async (req, res)=>{
-    try{
-        req.user.tokens = req.user.tokens.filter((token)=>{
-            return token.token!==req.token
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token
         })
         await req.user.save()
 
         res.send()
-    }catch{
+    } catch {
         res.status(500).send()
     }
     res.send('ki')
 })
 
-router.post('/users/logoutall', auth, async (req, res)=>{
-    try{
+router.post('/users/logoutall', auth, async (req, res) => {
+    try {
         req.user.tokens = []
         await req.user.save()
 
         res.send()
-    }catch{
+    } catch {
         res.status(500).send()
     }
     res.send('ki')
 })
 
-router.get('/users/me', auth, async (req, res)=>{
+router.get('/users/me', auth, async (req, res) => {
     // try{
     //     const result = await User.find({})
     //     res.send(result)
@@ -89,10 +89,41 @@ router.get('/users/me', auth, async (req, res)=>{
     res.send(req.user)
 })
 
-router.post('/users/me/avatar', upload.single('upload'), async(req, res)=>{
+router.post('/users/me/avatar', auth, upload.single('upload'), async (req, res) => {
+    const buffer = await sharp(req.file.buffer).resize({width:250, height:250}).png().toBuffer()
+    // req.user.avatar = req.file.buffer
+    req.user.avatar = buffer
+    //going to use sharp
+    await req.user.save()
     res.status(200).send()
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message })
 })
 
+//router to delete avatar
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    try {
+        req.user.avatar = undefined
+        await req.user.save()
+        res.status(200).send()
+    }catch(e){
+        res.status(400).send(e)
+    }
+})
+//router to fetch user img
+router.get('/users/:id/avatar', async (req, res)=>{
+    try{
+        const user = await User.findById(req.params.id)
+        console.log(user.avatar)
+        if(!user|| !user.avatar){
+            throw new Error('Fuck')
+        }
+        res.set('Content-Type', 'image/png') // bydefault set to json
+        res.send(user.avatar)
+    }catch(e){
+        res.status(404).send()
+    }
+})
 // router.get('/users/:id', async (req, res)=>{
 //    const _id = req.params.id
 //    try{
@@ -106,31 +137,31 @@ router.post('/users/me/avatar', upload.single('upload'), async(req, res)=>{
 //    }
 // })
 
-router.patch('/users/me', auth, async (req, res)=>{
+router.patch('/users/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'email', 'age', 'password']
-    const isValidOperation = updates.every((update)=>allowedUpdates.includes(update))
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
-    if(!isValidOperation){
+    if (!isValidOperation) {
         res.status(400).send('invalid updates property')
     }
-    try{
+    try {
         const user = await req.user
         //const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators:true})
         // if(!user){
         //     return res.status(404).send("user not found")
         // }
-        updates.forEach((update)=>user[update] = req.body[update])
+        updates.forEach((update) => user[update] = req.body[update])
         await user.save()
         res.send(user)
-    }catch(e){
+    } catch (e) {
         res.status(500).send(e)
     }
 
 })
 
-router.delete('/users/me', auth, async(req, res)=>{
-    try{
+router.delete('/users/me', auth, async (req, res) => {
+    try {
         // const user = await User.findByIdAndDelete(req.user._id)
         // if(!user){
         //     return res.status(404).send()
@@ -138,7 +169,7 @@ router.delete('/users/me', auth, async(req, res)=>{
         await req.user.remove()
 
         res.send(req.user)
-    }catch(e){
+    } catch (e) {
         res.status(500).send()
     }
 })
