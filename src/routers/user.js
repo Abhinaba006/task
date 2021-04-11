@@ -2,6 +2,7 @@ const express = require('express')
 const { model } = require('mongoose')
 const multer = require('multer')
 const sharp = require('sharp')
+const { sendWelcomeMail, sendCancelationMail} = require('../emails/account')
 const User = require('../models/users')
 const auth = require('../middlewares/auth')
 
@@ -35,6 +36,7 @@ router.post('/users', async (req, res) => {
     // })
     try {
         const result = await user.save()
+        sendWelcomeMail(user.email, user.name)
         const token = await user.generateAuthToken()
         res.status(201).send({ result, token })
     } catch (e) {
@@ -167,6 +169,8 @@ router.delete('/users/me', auth, async (req, res) => {
         //     return res.status(404).send()
 
         await req.user.remove()
+
+        sendCancelationMail(req.user.email, req.user.name)
 
         res.send(req.user)
     } catch (e) {
