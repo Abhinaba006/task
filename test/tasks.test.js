@@ -38,3 +38,11 @@ test('Should not delete other user data', async () => {
     .send()
     .expect(404)
 })
+
+/* idea to implement
+
+should delete user task
+should not delete task if not logged in
+not update other user task
+sorting, filtering and skipping
+*/
