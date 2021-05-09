@@ -15,7 +15,7 @@ const auth = async (req, res, next)=>{
         }
         req.token = token
         req.user = user
-        console.log(user)
+        // console.log(user)
         next()
     }catch(e){
         res.status(401).send("cant login")

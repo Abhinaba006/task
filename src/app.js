@@ -1,44 +1,44 @@
-const app = require('./app')
+const express = require('express')
+const bcrypt = require('bcryptjs')
+// const path = require('path')
+require('./db/mongoose')
+const User = require('./models/users')
+const Tasks = require('./models/tasks')
+const userRouter = require('./routers/user')
+const taskRouter = require('./routers/task')
+const auth = require('./middlewares/auth')
+const bodyParser = require("body-parser");
 
-const port = process.env.PORT || 3000
+/////////////////////////////////////
+//for frontend
+// const hbs = require('hbs')
+// //define paths for express
+// const public = path.join(__dirname, '../public');
+// const view_path = path.join(__dirname, '../templates/views')
+// const partials_path = path.join(__dirname, '../templates/partials')
 
-app.listen(port, ()=>{
-    console.log('Server is up at '+port)
-})
-// const express = require('express')
-// const bcrypt = require('bcryptjs')
-// // const path = require('path')
-// require('./db/mongoose')
-// const User = require('./models/users')
-// const Tasks = require('./models/tasks')
-// const userRouter = require('./routers/user')
-// const taskRouter = require('./routers/task')
-// const auth = require('./middlewares/auth')
-// const bodyParser = require("body-parser");
-
-// /////////////////////////////////////
-// //for frontend
-// // const hbs = require('hbs')
-// // //define paths for express
-// // const public = path.join(__dirname, '../public');
-// // const view_path = path.join(__dirname, '../templates/views')
-// // const partials_path = path.join(__dirname, '../templates/partials')
-
-// // init the app
-// const app = express()
-
-// // //set hbs
-// // app.set('view engine', 'hbs')
-// // app.set('views', view_path)
-// // hbs.registerPartials(partials_path)
-
-// // app.use(express.static(public)) ;   //setup directory to serve css
-
-// ////////////////////////////////
+// init the app
+const app = express()
 
 
+app.use(express.json())
+app.use(userRouter)
+app.use(taskRouter)
+
+module.exports = app
+
+// //set hbs
+// app.set('view engine', 'hbs')
+// app.set('views', view_path)
+// hbs.registerPartials(partials_path)
+
+// app.use(express.static(public)) ;   //setup directory to serve css
+
+////////////////////////////////
 
 
+
+// const port = process.env.PORT || 3000
 
 // // app.use((req, res, next)=>{
 // //     if(req.method ==='GET'){
@@ -50,6 +50,8 @@ app.listen(port, ()=>{
 
 // app.use((req, res, next)=>{
 //     res.status(503).send('fuck you ')
+// })  
+
 
 // without middleware new rwq -> run handler
 // with middleware new req -> do something -> run route handler
@@ -92,3 +94,4 @@ app.listen(port, ()=>{
 // app.post('/upload', upload.single('upload'), (req, res)=>{
 //     res.send()
 // })
+
